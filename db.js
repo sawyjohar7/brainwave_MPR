@@ -1,36 +1,25 @@
-// Step 1: Install the pg package first (run in terminal)
-// npm install pg
-
+// db.js
 const { Client } = require('pg');
+require('dotenv').config();
 
-// Connection parameters
 const client = new Client({
-     host: 'localhost',
-    port: 5432,
-    database: 'fuckedup',
-    user: 'postgres',
-    password: 'Hellosawyy', // your PostgreSQL password
+  host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 5432,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  ssl: { rejectUnauthorized: false } // required for Render PostgreSQL
 });
 
 async function main() {
-    try {
-        // Connect to the database
-        await client.connect();
-        console.log("Connected to the database successfully!");
-
-        // Fetch first 10 students
-        const res = await client.query("SELECT * FROM students ;");
-        res.rows.forEach(row => {
-            console.log(row);
-        });
-
-    } catch (err) {
-        console.error("Error:", err);
-    } finally {
-        // Close the connection
-        await client.end();
-        console.log("Database connection closed.");
-    }
+  try {
+    await client.connect();
+    console.log("✅ Connected to the PostgreSQL database successfully!");
+  } catch (err) {
+    console.error("❌ Database connection error:", err);
+  }
 }
 
 main();
+
+module.exports = client;
