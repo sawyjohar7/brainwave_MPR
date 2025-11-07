@@ -1,4 +1,5 @@
 const db = require('../db');
+const bcrypt = require('bcryptjs');
 
 // Get student by College_id (for login)
 exports.findByCollegeId = async (college_id) => {
@@ -8,6 +9,10 @@ exports.findByCollegeId = async (college_id) => {
 
 // Add new student
 exports.create = async (student) => {
+  // 🔹 Use roll_no as default password if password not provided
+  const plainPassword = student.password || student.Roll_no;
+  const hashedPassword = await bcrypt.hash(plainPassword, 12);
+
   await db.query(
     `INSERT INTO students 
     (roll_no, name, course, shift, section, college_id, year, email, password, isFirstLogin) 
@@ -21,7 +26,7 @@ exports.create = async (student) => {
       student.College_id,
       student.Year,
       student.email,
-      student.password,
+      hashedPassword,
       student.isFirstLogin,
     ]
   );
@@ -30,8 +35,9 @@ exports.create = async (student) => {
 
 // Update password
 exports.updatePassword = async (college_id, password) => {
+  const hashed = await bcrypt.hash(password, 12);
   await db.query(
     "UPDATE students SET password = $1, isFirstLogin = false WHERE college_id = $2",
-    [password, college_id]
+    [hashed, college_id]
   );
 };

@@ -8,7 +8,7 @@ const client = new Client({
   database: process.env.DB_NAME,
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
-  ssl: { rejectUnauthorized: false } // required for Render PostgreSQL
+  ssl: false // required for Render PostgreSQL /changed to false db connection error
 });
 
 async function main() {
