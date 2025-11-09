@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const client = require('../db'); // using your db.js client
+const client = require('../db');
 
 // ✅ Get all students
 router.get('/students', async (req, res) => {
   try {
-    const result = await client.query("SELECT * FROM students ORDER BY roll_no");
+    const result = await client.query('SELECT * FROM public.students ORDER BY roll_no');
     res.json(result.rows);
   } catch (err) {
     console.error(err);
@@ -19,7 +19,7 @@ router.post('/mark', async (req, res) => {
 
   try {
     await client.query(
-      `INSERT INTO attendance (student_id, date, status)
+      `INSERT INTO public.attendance (student_id, date, status)
        VALUES ($1, $2, $3)
        ON CONFLICT (student_id, date) DO UPDATE SET status = EXCLUDED.status`,
       [student_id, date, status]
@@ -37,8 +37,8 @@ router.get('/', async (req, res) => {
   try {
     const result = await client.query(`
       SELECT s.roll_no, s.name, a.date, a.status
-      FROM attendance a 
-      JOIN students s ON s.id = a.student_id
+      FROM public.attendance a 
+      JOIN public.students s ON s.roll_no = a.student_id
       ORDER BY a.date DESC
     `);
 
