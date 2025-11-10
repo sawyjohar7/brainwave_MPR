@@ -3,13 +3,18 @@ const bcrypt = require('bcryptjs');
 
 // Get student by College_id (for login)
 exports.findByCollegeId = async (college_id) => {
-  const res = await db.query("SELECT * FROM students WHERE college_id = $1", [college_id]);
+  const res = await db.query(
+    "SELECT * FROM students WHERE LOWER(college_id) = LOWER($1)",
+    [college_id]
+  );
   return res.rows[0];
 };
 
 // Add new student
 exports.create = async (student) => {
-  // 🔹 Use roll_no as default password if password not provided
+  student.College_id = student.College_id.toLowerCase();
+  student.email = student.email.toLowerCase();
+
   const plainPassword = student.password || student.Roll_no;
   const hashedPassword = await bcrypt.hash(plainPassword, 12);
 
@@ -32,6 +37,7 @@ exports.create = async (student) => {
   );
   return exports.findByCollegeId(student.College_id);
 };
+
 
 // Update password
 exports.updatePassword = async (college_id, password) => {
